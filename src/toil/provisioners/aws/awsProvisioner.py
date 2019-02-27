@@ -477,14 +477,14 @@ class AWSProvisioner(AbstractProvisioner):
     @classmethod
     def _getBlockDeviceMapping(cls, instanceType, rootVolSize=50):
         # determine number of ephemeral drives via cgcloud-lib (actually this is moved into toil's lib
-        bdtKeys = [''] + ['/dev/xvd{}'.format(c) for c in string.lowercase[1:]]
+        bdtKeys = [''] + ['/dev/xvd{}'.format(c) for c in string.ascii_lowercase[1:]]
         bdm = BlockDeviceMapping()
         # Change root volume size to allow for bigger Docker instances
         root_vol = BlockDeviceType(delete_on_termination=True)
         root_vol.size = rootVolSize
         bdm["/dev/xvda"] = root_vol
         # the first disk is already attached for us so start with 2nd.
-        for disk in range(1, instanceType.disks + 1):
+        for disk in range(1, int(instanceType.disks) + 1):
             bdm[bdtKeys[disk]] = BlockDeviceType(
                 ephemeral_name='ephemeral{}'.format(disk - 1))  # ephemeral counts start at 0
 

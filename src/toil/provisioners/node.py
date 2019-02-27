@@ -131,7 +131,7 @@ class Node(object):
                 raise RuntimeError("Docker daemon failed to start on machine with ip %s" % self.publicIP)
             try:
                 output = self.sshInstance('/usr/bin/ps', 'auxww', sshOptions=['-oBatchMode=yes'], user=keyName)
-                if 'dockerd' in output:
+                if b'dockerd' in output:
                     # docker daemon has started
                     logger.info('Docker daemon running')
                     break
@@ -152,8 +152,8 @@ class Node(object):
                                    " Check if the appliance is valid, e.g. check if the environment variable"
                                     " TOIL_APPLIANCE_SELF is set correctly and the container exists." % self.publicIP)
             try:
-                output = self.sshInstance('/usr/bin/docker', 'ps',
-                                          sshOptions=['-oBatchMode=yes'], user=keyName)
+                output = str(self.sshInstance('/usr/bin/docker', 'ps',
+                                          sshOptions=['-oBatchMode=yes'], user=keyName))
                 if role in output:
                     logger.info('...Toil appliance started')
                     break

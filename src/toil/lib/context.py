@@ -320,7 +320,7 @@ class Context(object):
 
         Illegal paths that would introduce ambiguity need to raise an exception
         >>> ctx.to_aws_name('/_') # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last): 
+        Traceback (most recent call last):
         ...
         InvalidPathError: Invalid path '/_'
         >>> ctx.to_aws_name('/_/') # doctest: +IGNORE_EXCEPTION_DETAIL
@@ -328,7 +328,7 @@ class Context(object):
         ...
         InvalidPathError: Invalid path '/_/'
         >>> ctx.from_aws_name('___') # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last): 
+        Traceback (most recent call last):
         ...
         InvalidPathError: Invalid path '/_/'
 
@@ -552,7 +552,7 @@ class Context(object):
         for policy_name, policy in iteritems(policies):
             current_policy = None
             try:
-                current_policy = json.loads(urllib.unquote(
+                current_policy = json.loads(urllib.parse.unquote(
                     get_policy(entity_name, policy_name).policy_document))
             except BotoServerError as e:
                 if e.status == 404 and e.error_code == 'NoSuchEntity':

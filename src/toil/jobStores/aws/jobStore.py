@@ -280,7 +280,7 @@ class AWSJobStore(AbstractJobStore):
                 with attempt:
                     assert self.jobsDomain.batch_put_attributes(items)
         self._batchedJobGraphs = None
-            
+
 
     def create(self, jobNode):
         jobStoreID = self._newJobID()
@@ -331,7 +331,7 @@ class AWSJobStore(AbstractJobStore):
 
     def update(self, job):
         log.debug("Updating job %s", job.jobStoreID)
-        item = self._awsJobToItem(job)        
+        item = self._awsJobToItem(job)
         for attempt in retry_sdb():
             with attempt:
                 assert self.jobsDomain.put_attributes(bytes(job.jobStoreID), item)
@@ -892,8 +892,9 @@ class AWSJobStore(AbstractJobStore):
             for attempt in retry_sdb():
                 with attempt:
                     self = cls.fromItem(
-                        cls.outer.filesDomain.get_attributes(item_name=bytes(jobStoreFileID),
-                                                             consistent_read=True))
+                        cls.outer.filesDomain.get_attributes(
+                            item_name=bytes(jobStoreFileID, 'utf8'),
+                            consistent_read=True))
                     return self
 
         @classmethod

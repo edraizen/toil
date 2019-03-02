@@ -256,7 +256,7 @@ class AWSProvisioner(AbstractProvisioner):
         kwargs = {'key_name': self._keyName,
                   'security_group_ids': [sg.id for sg in sgs],
                   'instance_type': instanceType.name,
-                  'user_data': userData,
+                  'user_data': bytes(userData, 'utf-8'),
                   'block_device_map': bdm,
                   'instance_profile_arn': arn,
                   'placement': self._zone,

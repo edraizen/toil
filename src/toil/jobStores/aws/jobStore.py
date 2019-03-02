@@ -35,14 +35,10 @@ import urllib.parse
 import urllib.request, urllib.parse, urllib.error
 
 # Python 3 compatibility imports
-try:
-    import reprlib
-    import BytesIO
-    StringIO = BytesIO
-except ImportError:
-    from six.moves import StringIO, reprlib
+import reprlib
+from io import BytesIO
+StringIO = BytesIO
 from six import iteritems
-import six.io.BytesIO as BytesIO
 
 from toil.lib.memoize import strict_bool
 from toil.lib.exceptions import panic
@@ -307,7 +303,7 @@ class AWSJobStore(AbstractJobStore):
         for attempt in retry_sdb():
             with attempt:
                 return bool(self.jobsDomain.get_attributes(
-                    item_name=bytes(jobStoreID),
+                    item_name=bytes(jobStoreID, 'utf-8'),
                     attribute_name=[SDBHelper.presenceIndicator()],
                     consistent_read=True))
 
@@ -326,7 +322,7 @@ class AWSJobStore(AbstractJobStore):
         item = None
         for attempt in retry_sdb():
             with attempt:
-                item = self.jobsDomain.get_attributes(bytes(jobStoreID), consistent_read=True)
+                item = self.jobsDomain.get_attributes(bytes(jobStoreID, 'utf-8'), consistent_read=True)
         if not item:
             raise NoSuchJobException(jobStoreID)
         job = self._awsJobFromItem(item)
@@ -340,7 +336,7 @@ class AWSJobStore(AbstractJobStore):
         item = self._awsJobToItem(job)
         for attempt in retry_sdb():
             with attempt:
-                assert self.jobsDomain.put_attributes(bytes(job.jobStoreID), item)
+                assert self.jobsDomain.put_attributes(bytes(job.jobStoreID, 'utf-8'), item)
 
     itemsPerBatchDelete = 25
 
@@ -352,14 +348,14 @@ class AWSJobStore(AbstractJobStore):
         item = None
         for attempt in retry_sdb():
             with attempt:
-                item = self.jobsDomain.get_attributes(bytes(jobStoreID), consistent_read=True)
+                item = self.jobsDomain.get_attributes(bytes(jobStoreID, 'utf-8'), consistent_read=True)
         self._checkItem(item)
         if item["overlargeID"]:
             log.debug("Deleting job from filestore")
             self.deleteFile(item["overlargeID"])
         for attempt in retry_sdb():
             with attempt:
-                self.jobsDomain.delete_attributes(item_name=bytes(jobStoreID))
+                self.jobsDomain.delete_attributes(item_name=bytes(jobStoreID, 'utf-8'))
         items = None
         for attempt in retry_sdb():
             with attempt:
@@ -382,9 +378,9 @@ class AWSJobStore(AbstractJobStore):
                 for attempt in retry_s3():
                     with attempt:
                         if version:
-                            self.filesBucket.delete_key(key_name=bytes(item.name), version_id=version)
+                            self.filesBucket.delete_key(key_name=bytes(item.name, 'utf-8'), version_id=version)
                         else:
-                            self.filesBucket.delete_key(key_name=bytes(item.name))
+                            self.filesBucket.delete_key(key_name=bytes(item.name, 'utf-8'))
 
     def getEmptyFileStoreID(self, jobStoreID=None):
         info = self.FileInfo.create(jobStoreID)
@@ -495,7 +491,7 @@ class AWSJobStore(AbstractJobStore):
             keyName = url.path[1:]
             bucketName = url.netloc
             bucket = s3.get_bucket(bucketName)
-            key = bucket.get_key(bytes(keyName))
+            key = bucket.get_key(bytes(keyName, 'utf-8'))
             if existing is True:
                 if key is None:
                     raise RuntimeError("Key '%s' does not exist in bucket '%s'." %
@@ -594,7 +590,7 @@ class AWSJobStore(AbstractJobStore):
     def writeStatsAndLogging(self, statsAndLoggingString):
         info = self.FileInfo.create(str(self.statsFileOwnerID))
         with info.uploadStream(multipart=False) as writeable:
-            writeable.write(bytes(statsAndLoggingString), 'utf-8')
+            writeable.write(bytes(statsAndLoggingString, 'utf-8'))
         info.save()
 
     def readStatsAndLogging(self, callback, readAll=False):
@@ -633,7 +629,7 @@ class AWSJobStore(AbstractJobStore):
                 f.write(info.content)
         for attempt in retry_s3():
             with attempt:
-                key = self.filesBucket.get_key(key_name=bytes(jobStoreFileID), version_id=info.version)
+                key = self.filesBucket.get_key(key_name=bytes(jobStoreFileID, 'utf-8'), version_id=info.version)
                 key.set_canned_acl('public-read')
                 url = key.generate_url(query_auth=False,
                                        expires_in=self.publicUrlExpiration.total_seconds())
@@ -889,7 +885,7 @@ class AWSJobStore(AbstractJobStore):
             for attempt in retry_sdb():
                 with attempt:
                     return bool(cls.outer.filesDomain.get_attributes(
-                        item_name=bytes(jobStoreFileID),
+                        item_name=bytes(jobStoreFileID, 'utf-8'),
                         attribute_name=[cls.presenceIndicator()],
                         consistent_read=True))
 

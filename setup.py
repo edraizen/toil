@@ -56,7 +56,6 @@ def runSetup():
         docker,
         dateutil,
         psutil,
-        subprocess32,
         addict,
         sphinx,
         pathlib2]

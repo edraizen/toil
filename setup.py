@@ -20,34 +20,33 @@ def runSetup():
     Calls setup(). This function exists so the setup() invocation preceded more internal
     functionality. The `version` module is imported dynamically by importVersion() below.
     """
-    boto = 'boto==2.48.0'
-    boto3 = 'boto3>=1.7.50, <2.0'
-    futures = 'futures==3.1.1'
-    pycryptodome = 'pycryptodome==3.5.1'
-    pymesos = 'pymesos==0.3.7'
-    psutil = 'psutil==3.0.1'
-    azureCosmosdbTable = 'azure-cosmosdb-table==0.37.1'
-    azureAnsible = 'ansible[azure]==2.5.0a1'
-    azureStorage = 'azure-storage==0.35.1'
-    secretstorage = 'secretstorage<3'
-    pynacl = 'pynacl==1.1.2'
-    gcs = 'google-cloud-storage==1.6.0'
-    gcs_oauth2_boto_plugin = 'gcs_oauth2_boto_plugin==1.14'
-    apacheLibcloud = 'apache-libcloud==2.2.1'
-    cwltool = 'cwltool==1.0.20181118133959'
-    schemaSalad = 'schema-salad>=2.6, <3'
-    galaxyLib = 'galaxy-lib==18.9.2'
+    boto = 'boto'
+    boto3 = 'boto3'
+    futures = 'futures'
+    pycryptodome = 'pycryptodome'
+    pymesos = 'pymesos'
+    psutil = 'psutil'
+    azureCosmosdbTable = 'azure-cosmosdb-table'
+    azureAnsible = 'ansible[azure]'
+    azureStorage = 'azure-storage'
+    secretstorage = 'secretstorage'
+    pynacl = 'pynacl'
+    gcs = 'google-cloud-storage'
+    gcs_oauth2_boto_plugin = 'gcs_oauth2_boto_plugin'
+    apacheLibcloud = 'apache-libcloud'
+    cwltool = 'cwltool'
+    schemaSalad = 'schema-salad>=2.6'
+    galaxyLib = 'galaxy-lib'
     htcondor = 'htcondor>=8.6.0'
-    dill = 'dill==0.2.7.1'
+    dill = 'dill'
     six = 'six>=1.10.0'
     future = 'future'
-    requests = 'requests==2.18.4'
-    docker = 'docker==2.5.1'
-    subprocess32 = 'subprocess32<=3.5.2'
+    requests = 'requests'
+    docker = 'docker'
     dateutil = 'python-dateutil'
-    addict = 'addict<=2.2.0'
-    sphinx = 'sphinx==1.7.5'
-    pathlib2 = 'pathlib2==2.3.2'
+    addict = 'addict'
+    sphinx = 'sphinx'
+    pathlib2 = 'pathlib2'
 
     core_reqs = [
         dill,
@@ -100,10 +99,6 @@ def runSetup():
         encryption_reqs + \
         google_reqs + \
         cwl_reqs
-
-    # remove the subprocess32 backport if not python2
-    if not sys.version_info[0] == 2:
-        core_reqs.remove(subprocess32)
 
     setup(
         name='toil',

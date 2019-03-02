@@ -22,7 +22,6 @@ def runSetup():
     """
     boto = 'boto'
     boto3 = 'boto3'
-    futures = 'futures'
     pycryptodome = 'pycryptodome'
     pymesos = 'pymesos'
     psutil = 'psutil'
@@ -66,7 +65,6 @@ def runSetup():
     aws_reqs = [
         boto,
         boto3,
-        futures,
         pycryptodome]
     azure_reqs = [
         azureCosmosdbTable,

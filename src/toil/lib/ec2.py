@@ -186,12 +186,13 @@ def create_spot_instances(ec2, price, image_id, spec, num_instances=1, timeout=N
     def spotRequestNotFound(e):
         return e.error_code == "InvalidSpotInstanceRequestID.NotFound"
 
+    spec["ImageId"] = image_id
+
     for attempt in retry_ec2(retry_for=a_long_time,
                              retry_while=inconsistencies_detected):
         with attempt:
             requests = ec2.request_spot_instances(
                 SpotPrice=price,
-                ImageId=image_id,
                 LaunchSpecification=spec,
                 InstanceCount=num_instances)
 

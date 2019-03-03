@@ -249,7 +249,7 @@ class AWSProvisioner(AbstractProvisioner):
                 raise RuntimeError("No spot bid given for a preemptable node request.")
         instanceType = E2Instances[nodeType]
         bdm = [{'DeviceName': key,
-                'VirtualName': _bdm.ephemeral_name,
+                'VirtualName': str(_bdm.ephemeral_name),
                 'Ebs': {'DeleteOnTermination': True}} for key, _bdm in \
                     self._getBlockDeviceMapping(instanceType, rootVolSize= \
                     self._nodeStorage).items()]

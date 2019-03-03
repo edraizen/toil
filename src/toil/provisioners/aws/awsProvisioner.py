@@ -17,6 +17,7 @@ from builtins import str
 from builtins import range
 import time
 import string
+import base64
 
 # Python 3 compatibility imports
 from _ssl import SSLError
@@ -248,9 +249,10 @@ class AWSProvisioner(AbstractProvisioner):
             else:
                 raise RuntimeError("No spot bid given for a preemptable node request.")
         instanceType = E2Instances[nodeType]
+
         bdm = [{'DeviceName': key,
                 'VirtualName': str(_bdm.ephemeral_name),
-                'Ebs': {'DeleteOnTermination': True}} for key, _bdm in \
+                'Ebs': {'DeleteOnTermination': True, 'VolumeSize':_bdm.size}} for key, _bdm in \
                     self._getBlockDeviceMapping(instanceType, rootVolSize= \
                     self._nodeStorage).items()]
         arn = self._getProfileARN()
@@ -261,9 +263,9 @@ class AWSProvisioner(AbstractProvisioner):
         kwargs = {'KeyName': self._keyName,
                   'SecurityGroupIds': [sg.id for sg in sgs],
                   'InstanceType': instanceType.name,
-                  'UserData': userData,
+                  'UserData': base64.b64encode(bytes(userData, 'utf-8')).decode("ascii"),
                   'BlockDeviceMappings': bdm,
-                  'IamInstanceProfile': {'Arn':arn},
+                  #'IamInstanceProfile': {'Arn':arn},
                   'Placement': {'AvailabilityZone':self._zone},
                   'SubnetId': self._subnetID}
 
@@ -282,6 +284,13 @@ class AWSProvisioner(AbstractProvisioner):
                     logger.debug('Launching %s preemptable nodes', numNodes)
                     kwargs['Placement'] = {'AvailabilityZone':getSpotZone(spotBid, instanceType.name, self._ctx)}
                     # force generator to evaluate
+                    print("Placement:", kwargs['Placement'])
+                    session = boto3.Session()
+                    credentials = session.get_credentials()
+                    credentials = credentials.get_frozen_credentials()
+                    access_key = credentials.access_key
+                    secret_key = credentials.secret_key
+                    print(access_key, secret_key)
                     instancesLaunched = list(create_spot_instances(ec2=self._ctx.ec2_client,
                                                                    price=spotBid,
                                                                    image_id=self._discoverAMI(),
@@ -491,7 +500,8 @@ class AWSProvisioner(AbstractProvisioner):
         # the first disk is already attached for us so start with 2nd.
         for disk in range(1, int(instanceType.disks) + 1):
             bdm[bdtKeys[disk]] = BlockDeviceType(
-                ephemeral_name='ephemeral{}'.format(disk - 1))  # ephemeral counts start at 0
+                ephemeral_name='ephemeral{}'.format(disk - 1),  # ephemeral counts start at 0
+                size=rootVolSize)
 
         logger.debug('Device mapping: %s', bdm)
         return bdm

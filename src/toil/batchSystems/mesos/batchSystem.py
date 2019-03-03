@@ -413,7 +413,7 @@ class MesosBatchSystem(BatchSystemLocalSupport,
                                                                    executorID=task.executor.executor_id.value,
                                                                    cores=resources.cores,
                                                                    memory=resources.memory)
-            del self.taskResources[resourceKey]
+            del self.gResources[resourceKey]
             log.debug('Launched Mesos task %s.', task.task_id.value)
 
     def resourceOffers(self, driver, offers):

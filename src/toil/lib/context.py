@@ -181,7 +181,7 @@ class Context(object):
         :rtype: VPCConnection
         """
         if self.__client is None:
-            self.__client = client = boto3.client('ec2', self.availability_zone)
+            self.__client = client = boto3.client('ec2', self.availability_zone[:-1])
         return self.__client
 
     @property

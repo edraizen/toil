@@ -197,7 +197,7 @@ def create_spot_instances(ec2, price, image_id, spec, num_instances=1, timeout=N
                 InstanceCount=num_instances)
 
     if tags is not None:
-        for requestID in (request.id for request in requests):
+        for requestID in (request["SpotInstanceRequestId"] for request in requests["SpotInstanceRequests"]):
             for attempt in retry_ec2(retry_while=spotRequestNotFound):
                 with attempt:
                     ec2.create_tags([requestID], tags)

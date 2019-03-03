@@ -294,7 +294,7 @@ class AWSProvisioner(AbstractProvisioner):
                     instancesLaunched = list(create_spot_instances(ec2=self._ctx.ec2_client,
                                                                    price=spotBid,
                                                                    image_id=self._discoverAMI(),
-                                                                   tags={'clusterName': self.clusterName},
+                                                                   tags={'Key':'clusterName', 'Value':self.clusterName},
                                                                    spec=kwargs,
                                                                    num_instances=numNodes,
                                                                    tentative=True)

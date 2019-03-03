@@ -200,7 +200,7 @@ def create_spot_instances(ec2, price, image_id, spec, num_instances=1, timeout=N
         for requestID in (request["SpotInstanceRequestId"] for request in requests["SpotInstanceRequests"]):
             for attempt in retry_ec2(retry_while=spotRequestNotFound):
                 with attempt:
-                    ec2.create_tags([requestID], tags)
+                    ec2.create_tags(Resources=[requestID], Tags=[tags])
 
     num_active, num_other = 0, 0
     # noinspection PyUnboundLocalVariable,PyTypeChecker

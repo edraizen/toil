@@ -22,6 +22,7 @@ import string
 from _ssl import SSLError
 from six import iteritems
 from toil.lib.memoize import memoize
+import boto3
 import boto.ec2
 from boto.ec2.blockdevicemapping import BlockDeviceMapping, BlockDeviceType
 from boto.exception import BotoServerError, EC2ResponseError
@@ -277,7 +278,7 @@ class AWSProvisioner(AbstractProvisioner):
                     logger.debug('Launching %s preemptable nodes', numNodes)
                     kwargs['placement'] = getSpotZone(spotBid, instanceType.name, self._ctx)
                     # force generator to evaluate
-                    instancesLaunched = list(create_spot_instances(ec2=self._ctx.ec2,
+                    instancesLaunched = list(create_spot_instances(ec2=self._ctx.ec2_client,
                                                                    price=spotBid,
                                                                    image_id=self._discoverAMI(),
                                                                    tags={'clusterName': self.clusterName},

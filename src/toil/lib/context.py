@@ -5,6 +5,7 @@ import os
 import urllib
 import re
 import logging
+import boto3
 from boto import iam, sns, sqs, vpc
 from boto.exception import BotoServerError
 from boto.s3.connection import S3Connection
@@ -120,6 +121,7 @@ class Context(object):
         self.__s3 = None
         self.__sns = None
         self.__sqs = None
+        self.__client = None
 
         self.availability_zone = availability_zone
         m = self.availability_zone_re.match(availability_zone)
@@ -172,6 +174,15 @@ class Context(object):
         :rtype: VPCConnection
         """
         return self.vpc
+
+    @property
+    def ec2_client(self):
+        """
+        :rtype: VPCConnection
+        """
+        if self.__client is None:
+            self.__client = client = boto3.client('ec2', self.availability_zone)
+        return self.__client
 
     @property
     def s3(self):

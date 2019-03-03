@@ -189,9 +189,11 @@ def create_spot_instances(ec2, price, image_id, spec, num_instances=1, timeout=N
     for attempt in retry_ec2(retry_for=a_long_time,
                              retry_while=inconsistencies_detected):
         with attempt:
-            print("SPEC IS", spec)
             requests = ec2.request_spot_instances(
-                price, image_id, count=num_instances, **spec)
+                SpotPrice=price,
+                ImageId=image_id,
+                LaunchSpecification=spec,
+                InstanceCount=num_instances)
 
     if tags is not None:
         for requestID in (request.id for request in requests):

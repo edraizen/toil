@@ -253,14 +253,14 @@ class AWSProvisioner(AbstractProvisioner):
         keyPath = self._sseKey if self._sseKey else None
         userData =  self._getCloudConfigUserData('worker', self._masterPublicKey, keyPath, preemptable)
         sgs = [sg for sg in self._ctx.ec2.get_all_security_groups() if sg.name == self.clusterName]
-        kwargs = {'key_name': self._keyName,
-                  'security_group_ids': [sg.id for sg in sgs],
+        kwargs = {'KeyName': self._keyName,
+                  'SecurityGroupIds': [sg.id for sg in sgs],
                   'instance_type': instanceType.name,
-                  'user_data': bytes(userData, 'utf-8'),
-                  'block_device_map': bdm,
-                  'instance_profile_arn': arn,
-                  'placement': self._zone,
-                  'subnet_id': self._subnetID}
+                  'UserData': bytes(userData, 'utf-8'),
+                  'BlockDeviceMappings': bdm,
+                  'IamInstanceProfile': arn,
+                  'Placement': self._zone,
+                  'SubnetId': self._subnetID}
 
         instancesLaunched = []
 

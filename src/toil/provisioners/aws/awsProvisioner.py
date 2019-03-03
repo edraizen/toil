@@ -263,7 +263,7 @@ class AWSProvisioner(AbstractProvisioner):
                   'InstanceType': instanceType.name,
                   'UserData': userData,
                   'BlockDeviceMappings': bdm,
-                  'IamInstanceProfile': {'Arn':arn}
+                  'IamInstanceProfile': {'Arn':arn},
                   'Placement': {'AvailabilityZone':self._zone},
                   'SubnetId': self._subnetID}
 

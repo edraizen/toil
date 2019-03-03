@@ -280,7 +280,7 @@ class AWSProvisioner(AbstractProvisioner):
                                                                   spec=kwargs, num_instances=numNodes)
                 else:
                     logger.debug('Launching %s preemptable nodes', numNodes)
-                    kwargs['placement'] = getSpotZone(spotBid, instanceType.name, self._ctx)
+                    kwargs['Placement'] = {'AvailabilityZone':getSpotZone(spotBid, instanceType.name, self._ctx)}
                     # force generator to evaluate
                     instancesLaunched = list(create_spot_instances(ec2=self._ctx.ec2_client,
                                                                    price=spotBid,

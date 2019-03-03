@@ -248,7 +248,12 @@ class AWSProvisioner(AbstractProvisioner):
             else:
                 raise RuntimeError("No spot bid given for a preemptable node request.")
         instanceType = E2Instances[nodeType]
-        bdm = self._getBlockDeviceMapping(instanceType, rootVolSize=self._nodeStorage)
+        bdm = [{'DeviceName': key
+                'VirtualName': _bdm.ephemeral_name,
+                'Ebs': {
+                    'DeleteOnTermination': True
+                } for key, _bdm in self._getBlockDeviceMapping(instanceType, \
+                rootVolSize=self._nodeStorage).items()]
         arn = self._getProfileARN()
 
         keyPath = self._sseKey if self._sseKey else None
@@ -256,11 +261,11 @@ class AWSProvisioner(AbstractProvisioner):
         sgs = [sg for sg in self._ctx.ec2.get_all_security_groups() if sg.name == self.clusterName]
         kwargs = {'KeyName': self._keyName,
                   'SecurityGroupIds': [sg.id for sg in sgs],
-                  'instance_type': instanceType.name,
-                  'UserData': bytes(userData, 'utf-8'),
+                  'InstanceType': instanceType.name,
+                  'UserData': userData,
                   'BlockDeviceMappings': bdm,
-                  'IamInstanceProfile': arn,
-                  'Placement': self._zone,
+                  'IamInstanceProfile': {'Arn':arn}
+                  'Placement': {'AvailabilityZone':self._zone},
                   'SubnetId': self._subnetID}
 
         instancesLaunched = []

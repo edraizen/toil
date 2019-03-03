@@ -89,7 +89,7 @@ class Shape(object):
 
     def __str__(self):
         return self.__repr__()
-                
+
     def __hash__(self):
         # Since we replaced __eq__ we need to replace __hash__ as well.
         return hash(

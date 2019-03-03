@@ -134,23 +134,23 @@ def wait_spot_requests_active(ec2, requests, timeout=None, tentative=False):
             open_ids, eval_ids, fulfill_ids = set(), set(), set()
             batch = []
             for r in requests:
-                if r.state == 'open':
-                    open_ids.add(r.id)
-                    if r.status.code == 'pending-evaluation':
-                        eval_ids.add(r.id)
-                    elif r.status.code == 'pending-fulfillment':
-                        fulfill_ids.add(r.id)
+                if r["State"] == 'open':
+                    open_ids.add(r["SpotInstanceRequestId"])
+                    if r["Status"]["Code"] == 'pending-evaluation':
+                        eval_ids.add(r["SpotInstanceRequestId"])
+                    elif r["Status"]["Code"] == 'pending-fulfillment':
+                        fulfill_ids.add(r["SpotInstanceRequestId"])
                     else:
                         log.info(
                             'Request %s entered status %s indicating that it will not be '
-                            'fulfilled anytime soon.', r.id, r.status.code)
-                elif r.state == 'active':
-                    assert r.id not in active_ids
-                    active_ids.add(r.id)
+                            'fulfilled anytime soon.', r["SpotInstanceRequestId"], r["Status"]["Code"])
+                elif r["State"] == 'open' == 'active':
+                    assert r["SpotInstanceRequestId"] not in active_ids
+                    active_ids.add(r["SpotInstanceRequestId"])
                     batch.append(r)
                 else:
-                    assert r.id not in other_ids
-                    other_ids.add(r.id)
+                    assert r["SpotInstanceRequestId"] not in other_ids
+                    other_ids.add(r["SpotInstanceRequestId"])
                     batch.append(r)
             if batch:
                 yield batch
@@ -206,7 +206,7 @@ def create_spot_instances(ec2, price, image_id, spec, num_instances=1, timeout=N
     # noinspection PyUnboundLocalVariable,PyTypeChecker
     # request_spot_instances's type annotation is wrong
     for batch in wait_spot_requests_active(ec2,
-                                           requests,
+                                           requests["SpotInstanceRequests"],
                                            timeout=timeout,
                                            tentative=tentative):
         instance_ids = []
